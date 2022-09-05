@@ -161,7 +161,7 @@ function Projectile.new( part
                 = (self.Part.CFrame * self.ForwardOffset).LookVector
                 * self.Velocity
 
-            self.Velocity += self.Acceleartion * deltaTime
+            self.Velocity += self.Acceleration * deltaTime
         end
 
         local function Collide(infractor)
