@@ -99,9 +99,10 @@ function Projectile.new( part
                        , velocity
                        , deadline
                        , mass
-                       , target
+                       , targeter
                        , rotationForce
-                       , acceleration )
+                       , acceleration
+                       , singularity )
     local self = {}
 
     self.Part              = part
@@ -113,9 +114,10 @@ function Projectile.new( part
     self.Velocity          = velocity
     self.Deadline          = deadline
     self.Mass              = mass or 0
-    self.Target            = target
+    self.Targeter          = targeter
     self.RotationForce     = rotationForce
     self.Acceleration      = acceleration or 0
+    self.Singularity       = singularity or 0
 
     Projectile.Tools.SetMass(self.Part, self.Mass, nil)
 
@@ -125,9 +127,11 @@ function Projectile.new( part
     function self.Spawn(self)
         self.Part.Parent
             = workspace
+            
         self.Part.Position
             = self.Origin
             + self.OriginOffset
+
         self.Part.Orientation
             = self.Orientation
             + self.OrientationOffset
@@ -145,9 +149,11 @@ function Projectile.new( part
 
         local function Update(_, deltaTime)
 
-            if self.Target then
+            local target = self.Targeter and self.Targeter() or nil
+
+            if target then
                 local targetDirection
-                    = (self.Target.Position - self.Part.Position).Unit
+                    = (target.Position - self.Part.Position).Unit
 
                 local toRotate
                     = (self.Part.CFrame * self.ForwardOffset).LookVector:Cross(targetDirection).Unit
@@ -155,6 +161,8 @@ function Projectile.new( part
                 self.AVController.AngularVelocity
                     = toRotate
                     * self.RotationForce
+
+                self.RotationForce += self.Singularity * deltaTime
             end
 
             self.LVController.VectorVelocity
@@ -166,9 +174,11 @@ function Projectile.new( part
 
         local function Collide(infractor)
             if b_UCollide(infractor, self.Part) then
+
                 updateHook:Disconnect()
                 collisionHook:Disconnect()
                 self.Part:Destroy()
+
             end
         end
 
