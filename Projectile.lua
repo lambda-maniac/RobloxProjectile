@@ -127,7 +127,7 @@ function Projectile.new( part
     function self.Spawn(self)
         self.Part.Parent
             = workspace
-            
+
         self.Part.Position
             = self.Origin
             + self.OriginOffset
@@ -163,6 +163,8 @@ function Projectile.new( part
                     * self.RotationForce
 
                 self.RotationForce += self.Singularity * deltaTime
+            else
+                self.AVController.AngularVelocity = Vector3.zero
             end
 
             self.LVController.VectorVelocity
