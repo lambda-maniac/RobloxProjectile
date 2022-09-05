@@ -25,9 +25,10 @@ local projectileInfo = {
     velocity          , -- Projectile's velocity.
     deadline          , -- Projectile's lifetime.
     mass              , -- Projectile's mass (Optional, 0 by default).
-    target            , -- Target to seek for (Optional).
+    targeter          , -- Function to tell what to seek for (Optional).
     rotationForce     , -- Angular rotation force applied to lock-on (Required if Target is not `nil`).
-    acceleration        -- Projectile's acceleration over time (Optional).
+    acceleration      , -- Projectile's acceleration over time (Optional, 0 by default).
+    singularity         -- Projectile's rotation force acceleration over time (Optional, 0 by default).
 }
 ...
 ```
@@ -48,6 +49,16 @@ end
 ```
 > Just Remember that the CheckCollision function must have a signature of `Collision -> Part -> Bool`.
 
+Here's an example on how to define a Targeter function:
+```lua
+-- Function that targets workspace parts named "ToKill".
+local function Targeter()
+    return workspace:FindFirstChild("ToKill")
+end
+...
+```
+> This function goes in the constructor method, namely `targeter`.
+
 Now that everything is in place, we can instantiate a projectile and shoot it:
 ```lua
 -- Create the projectile from the configuration table.
@@ -56,4 +67,6 @@ Projectile.new(
 ):Act(CheckCollision) -- Spawning with the wanted collision function.
 ...
 ```
+> Remember to use `task.spawn` to not block the thread if you plan on this inside loops.
+
 And that's it! Thank you for reading.
